@@ -1,0 +1,6 @@
+rootProject.name = 'JavaTorrent'
+
+include 'library'
+include 'application'
+include 'client'
+
