@@ -1,9 +1,12 @@
 package com.example.multimodule.application.handler;
 
 //import com.example.multimodule.application.data.Client;
+//import com.example.multimodule.application.data.Pack;
+import com.example.multimodule.application.data.Client;
+import com.example.multimodule.application.data.Pack;
 import com.example.multimodule.application.handler.model.DataService;
-import com.example.multimodule.data.Client;
-import com.example.multimodule.data.Pack;
+//import com.example.multimodule.data.Client;
+//import com.example.multimodule.data.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

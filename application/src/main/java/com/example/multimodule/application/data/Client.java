@@ -1,4 +1,4 @@
-package com.example.multimodule.data;
+package com.example.multimodule.application.data;
 
 public class Client {
     public String id;

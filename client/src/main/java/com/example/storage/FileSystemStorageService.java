@@ -1,5 +1,7 @@
 package com.example.storage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -8,6 +10,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -15,11 +18,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
 public class FileSystemStorageService implements StorageService {
+
+	Logger logger = LoggerFactory.getLogger(FileSystemStorageService.class);
 
 	private Path rootLocation;
 
@@ -55,29 +62,61 @@ public class FileSystemStorageService implements StorageService {
 		}
 	}
 
+//	@Override
+//	public void store(Resource file) {
+//		logger.info("Trying to store a file...");
+//		try {
+//			logger.info("Storing the file: " + file.getFile().getTotalSpace());
+//			if (file.contentLength() == 0) {
+//				throw new StorageException("Failed to store empty file.");
+//			}
+//			Path destinationFile = this.rootLocation.resolve(
+//							Paths.get(Objects.requireNonNull(file.getFilename())))
+//					.normalize().toAbsolutePath();
+//			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+//				// This is a security check
+//				throw new StorageException(
+//						"Cannot store file outside current directory.");
+//			}
+//			try (InputStream inputStream = file.getInputStream()) {
+//				Files.copy(inputStream, destinationFile,
+//						StandardCopyOption.REPLACE_EXISTING);
+//			}
+//		}
+//		catch (IOException e) {
+//			throw new StorageException("Failed to store file.", e);
+//		}
+//	}
+
 	@Override
-	public void store(Resource file) {
+	public void store(byte[] fileBytes, String fileName) {
+		logger.info("Trying to store a file...");
+
+
 		try {
-			if (file.contentLength() == 0) {
+			//logger.info("Storing the file: " + file.getFile().getTotalSpace());
+			if (fileBytes.length == 0) {
 				throw new StorageException("Failed to store empty file.");
 			}
 			Path destinationFile = this.rootLocation.resolve(
-							Paths.get(Objects.requireNonNull(file.getFilename())))
+							Paths.get(Objects.requireNonNull(fileName)))
 					.normalize().toAbsolutePath();
 			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
 				// This is a security check
 				throw new StorageException(
 						"Cannot store file outside current directory.");
 			}
-			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, destinationFile,
-						StandardCopyOption.REPLACE_EXISTING);
-			}
+//			try (InputStream inputStream = file.getInputStream()) {
+//				Files.copy(inputStream, destinationFile,
+//						StandardCopyOption.REPLACE_EXISTING);
+//			}
+			Files.write(destinationFile, fileBytes);
 		}
 		catch (IOException e) {
 			throw new StorageException("Failed to store file.", e);
 		}
 	}
+
 
 	@Override
 	public Stream<Path> loadAll() {
@@ -114,6 +153,14 @@ public class FileSystemStorageService implements StorageService {
 		catch (MalformedURLException e) {
 			throw new StorageFileNotFoundException("Could not read file: " + filename, e);
 		}
+	}
+
+	@Override
+	public Resource loadPackFileAsResource(String packId) {
+		List<Path> neededFile = loadAll()
+				.filter(path -> (path.getFileName().toString().contains(packId)))
+				.collect(Collectors.toList());
+		return loadAsResource(neededFile.get(0).getFileName().toString());
 	}
 
 	@Override

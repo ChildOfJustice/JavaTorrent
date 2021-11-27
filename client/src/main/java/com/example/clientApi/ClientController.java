@@ -2,7 +2,8 @@ package com.example.clientApi;
 
 import com.example.FileManager;
 import com.example.core.RestClient;
-import com.example.multimodule.data.Pack;
+//import com.example.multimodule.data.Pack;
+import com.example.core.data.Pack;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
@@ -19,7 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -53,6 +58,16 @@ public class ClientController {
 
         restClient = new RestClient(centerUrl);
         restClient.post("/clients", "{\"id\":\"" + clientId + "\", \"ip\":\"" + thisClientUrl + "\"}");
+
+        //TODO pushing the info about existing packs
+
+        fileManager.getStorageService().loadAll().forEach(
+                path -> {
+                    logger.info("Found file in the storage: " + path.getFileName());
+                    String[] packId_fileId = path.getFileName().toString().split("\\|");
+                    restClient.post("/packs", "{\"id\":\"" + packId_fileId[0] + "\", \"fileId\":\"" + packId_fileId[1] + "\", \"ownerClientId\":\"" + clientId + "\"}");
+                }
+        );
     }
 
 
@@ -78,10 +93,18 @@ public class ClientController {
 
     @GetMapping("/packs/{packId:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> getPack(@PathVariable String packId) {
+    public byte[] getPack(@PathVariable String packId) {
         logger.info("Got a GET download a PACK request");
-        Resource file = fileManager.getStorageService().loadAsResource(packId);
-        return ResponseEntity.ok().body(file);
+        Resource fileResource = fileManager.getStorageService().loadPackFileAsResource(packId);
+        //return ResponseEntity.ok().body(file).;
+
+        try {
+            File file =  fileResource.getFile();
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void pushInfoAboutDownloadedPack(Pack pack){

@@ -1,10 +1,14 @@
 package com.example.core;
 
+import com.example.FileManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 public class RestClient {
+    Logger logger = LoggerFactory.getLogger(RestClient.class);
 
     private String server;
     private RestTemplate rest;
@@ -26,10 +30,14 @@ public class RestClient {
         return responseEntity.getBody();
     }
 
-    public Resource getResource(String uri) {
-        HttpEntity<String> requestEntity = new HttpEntity<String>("", headers);
-        ResponseEntity<Resource> responseEntity = rest.exchange(server + uri, HttpMethod.GET, requestEntity, Resource.class);
+    public byte[] getBytes(String uri) {
+        logger.info("GETTING RESOURCE: " + server + uri);
+        //HttpEntity<String> requestEntity = new HttpEntity<String>("", headers);
+        HttpEntity<String> requestEntity = new HttpEntity<String>("");
+        ResponseEntity<byte[]> responseEntity = rest.exchange(server + uri, HttpMethod.GET, requestEntity, byte[].class);
+        logger.info("GETTING RESOURCE STATUS: " + responseEntity.getStatusCode());
         this.setStatus(responseEntity.getStatusCode());
+        logger.error("RESPONSE BODY: " + new String(responseEntity.getBody()));
         return responseEntity.getBody();
     }
 

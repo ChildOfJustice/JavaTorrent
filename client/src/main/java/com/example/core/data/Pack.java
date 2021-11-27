@@ -1,4 +1,4 @@
-package com.example.multimodule.data;
+package com.example.core.data;
 
 public class Pack {
 

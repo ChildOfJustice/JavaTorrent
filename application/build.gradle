@@ -10,12 +10,16 @@ sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation project(':library')
+//	implementation 'com.example:library-0.0.1-SNAPSHOT'
+//	implementation project(':library')
 
 //	implementation files('libs/library-0.0.1-SNAPSHOT.jar')
 
