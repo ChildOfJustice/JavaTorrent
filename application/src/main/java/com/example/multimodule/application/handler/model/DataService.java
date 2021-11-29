@@ -15,25 +15,29 @@ public class DataService {
 
     ClientPackIds clientPackIds;
     PackFileIds packFileIds;
+    PackIdPackNumber packIdPackNumber;
     ClientIps clientIps;
 
     @Autowired
-    public DataService(ClientPackIds clientPackIds, PackFileIds packFileIds, ClientIps clientIps) {
+    public DataService(ClientPackIds clientPackIds, PackFileIds packFileIds, PackIdPackNumber packIdPackNumber, ClientIps clientIps) {
         this.clientPackIds = clientPackIds;
         this.packFileIds = packFileIds;
         this.clientIps = clientIps;
+        this.packIdPackNumber = packIdPackNumber;
     }
 
     public void addPack(Pack pack){
         packFileIds.addPackIfNotExists(pack);
         clientPackIds.addPack(pack);
+        packIdPackNumber.addPackNumber(pack);
     }
 
     public ArrayList<Pack> findAllPackForFile(String fileId){
-        ArrayList<Pack> packsWithFileId = packFileIds.findAllFilePacks(fileId);
-        clientPackIds.addClientIdToPacks(packsWithFileId);
-        clientIps.addOwnerIpToPacks(packsWithFileId);
-        return packsWithFileId;
+        ArrayList<Pack> aggregatedPacks = packFileIds.findAllFilePacks(fileId);
+        clientPackIds.addClientIdToPacks(aggregatedPacks);
+        packIdPackNumber.addNumberToPacks(aggregatedPacks);
+        clientIps.addOwnerIpToPacks(aggregatedPacks);
+        return aggregatedPacks;
     }
 
     public ArrayList<Pack> getAllPacks(){
