@@ -39,8 +39,16 @@ public class Pack {
         this.ownerClientIp = ownerClientIp;
     }
 
+    public long getNumber() {
+        return number;
+    }
+
+    public void setNumber(long number) {
+        this.number = number;
+    }
 
     public String id;
+    public long number;
     public String fileId;
     public String ownerClientId;
     public String ownerClientIp;

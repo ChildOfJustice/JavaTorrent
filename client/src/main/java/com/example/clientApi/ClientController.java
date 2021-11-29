@@ -59,15 +59,29 @@ public class ClientController {
         restClient = new RestClient(centerUrl);
         restClient.post("/clients", "{\"id\":\"" + clientId + "\", \"ip\":\"" + thisClientUrl + "\"}");
 
-        //TODO pushing the info about existing packs
-
-        fileManager.getStorageService().loadAll().forEach(
+        fileManager.getStorageService().loadAllFiles().forEach(
                 path -> {
-                    logger.info("Found file in the storage: " + path.getFileName());
-                    String[] packId_fileId = path.getFileName().toString().split("\\|");
-                    restClient.post("/packs", "{\"id\":\"" + packId_fileId[0] + "\", \"fileId\":\"" + packId_fileId[1] + "\", \"ownerClientId\":\"" + clientId + "\"}");
+                    String fullFileName = path.getFileName().toString();
+                    if(!fullFileName.startsWith(".") && !fullFileName.equals(fileManager.getStorageService().filesFolder)) {
+                        logger.info("Found a FULL FILE in the storage: " + path.getFileName());
+                        //TODO split file by packs and post them to the server
+                        fileManager.getStorageService().splitFileToPacks(path.getFileName().toString());
+                    }
                 }
         );
+
+        fileManager.getStorageService().loadAllPacks().forEach(
+                path -> {
+                    String packFileName = path.getFileName().toString();
+                    if(!packFileName.startsWith(".") && !packFileName.equals(fileManager.getStorageService().filesFolder)){
+                        logger.info("Found a PACK file in the storage: " + path.getFileName());
+
+                        String[] packId_fileId_packNumber = path.getFileName().toString().split("\\|");
+                        restClient.post("/packs", "{\"id\":\"" + packId_fileId_packNumber[0] + "\", \"fileId\":\"" + packId_fileId_packNumber[1] + "\", \"ownerClientId\":\"" + clientId + "\", \"number\":" + packId_fileId_packNumber[2] + "}");
+                    }
+                }
+        );
+//        fileManager.getStorageService().constructFilesFromPacks("1920f95a-6607-4f0c-9786-d002c6e8328c");
     }
 
 

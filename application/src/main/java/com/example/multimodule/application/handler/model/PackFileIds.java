@@ -1,7 +1,5 @@
 package com.example.multimodule.application.handler.model;
 
-//import com.example.multimodule.application.data.Pack;
-//import com.example.multimodule.data.Pack;
 import com.example.multimodule.application.data.Pack;
 import org.springframework.stereotype.Component;
 

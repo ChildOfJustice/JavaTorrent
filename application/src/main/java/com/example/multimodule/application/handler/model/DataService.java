@@ -1,9 +1,5 @@
 package com.example.multimodule.application.handler.model;
 
-//import com.example.multimodule.application.data.Client;
-//import com.example.multimodule.application.data.Pack;
-//import com.example.multimodule.data.Client;
-//import com.example.multimodule.data.Pack;
 import com.example.multimodule.application.data.Client;
 import com.example.multimodule.application.data.Pack;
 import org.slf4j.Logger;

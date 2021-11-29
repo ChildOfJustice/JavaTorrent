@@ -1,20 +1,19 @@
 package com.example;
 
 import com.example.core.RestClient;
-//import com.example.multimodule.data.Pack;
 import com.example.core.data.Pack;
-import com.example.storage.StorageService;
+import com.example.storage.FileSystemStorageService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Component
@@ -23,14 +22,14 @@ public class FileManager {
 
     ExecutorService executorService;
 
-    private StorageService storageService;
+    private FileSystemStorageService storageService;
 
     @Autowired
-    public FileManager(StorageService storageService){
+    public FileManager(FileSystemStorageService storageService){
         this.storageService = storageService;
     }
 
-    public StorageService getStorageService(){
+    public FileSystemStorageService getStorageService(){
         return storageService;
     }
 
@@ -49,7 +48,7 @@ public class FileManager {
                         byte[] fileBytes = restClient.getBytes("/packs/" + pack.getId());
                         logger.info("Pack file length: " + fileBytes.length);
 
-                        storageService.store(fileBytes, joinPackIdAndFileId(pack.getId(), pack.getFileId()));
+                        storageService.store(fileBytes, storageService.joinPackId_FileId_PackNumber(pack.getId(), pack.getFileId(), pack.getNumber()));
 
                         callBack.accept(pack);
                     } catch (Exception e){
@@ -62,13 +61,19 @@ public class FileManager {
         }
         //TODO WAIT FOR ALL
         executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60*3, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        //TODO all downloaded packs were with number 0!!!
+        storageService.constructFilesFromPacks(filePacks.get(0).getFileId());
+
         errors.forEach(
                 (k, v) -> logger.error("PACK " + k + " FAILED: " + v)
         );
-
-    }
-
-    public String joinPackIdAndFileId(String packId, String fileId){
-        return packId + "|" + fileId;
     }
 }

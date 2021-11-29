@@ -37,14 +37,13 @@ public class RestClient {
         ResponseEntity<byte[]> responseEntity = rest.exchange(server + uri, HttpMethod.GET, requestEntity, byte[].class);
         logger.info("GETTING RESOURCE STATUS: " + responseEntity.getStatusCode());
         this.setStatus(responseEntity.getStatusCode());
-        logger.error("RESPONSE BODY: " + new String(responseEntity.getBody()));
+//        logger.error("RESPONSE BODY: " + new String(responseEntity.getBody()));
         return responseEntity.getBody();
     }
 
 
 
     public String post(String uri, String json) {
-        System.out.println("URL: " + server+uri);
         HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
         ResponseEntity<String> responseEntity = rest.exchange(server + uri, HttpMethod.POST, requestEntity, String.class);
         this.setStatus(responseEntity.getStatusCode());

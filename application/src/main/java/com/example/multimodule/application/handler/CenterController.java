@@ -1,7 +1,5 @@
 package com.example.multimodule.application.handler;
 
-//import com.example.multimodule.application.data.Client;
-//import com.example.multimodule.application.data.Pack;
 import com.example.multimodule.application.data.Client;
 import com.example.multimodule.application.data.Pack;
 import com.example.multimodule.application.handler.model.DataService;
@@ -50,7 +48,8 @@ public class CenterController {
     public ResponseEntity<ArrayList<Pack>> getPackInfoByFileId(@PathVariable String fileId) {
         logger.info("Got a GET packs for specified file request");
         ArrayList<Pack> packs = dataService.findAllPackForFile(fileId);
-        logger.info("IP0:" + packs.get(0).getOwnerClientIp());
+//        logger.info("IP0:" + packs.get(0).getOwnerClientIp());
+        logger.info("Returning packs: " + packs.size());
         if (packs.size() == 0)
             return ResponseEntity.notFound().build();
         else

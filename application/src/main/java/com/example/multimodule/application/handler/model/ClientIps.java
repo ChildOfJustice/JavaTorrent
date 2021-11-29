@@ -1,9 +1,5 @@
 package com.example.multimodule.application.handler.model;
 
-//import com.example.multimodule.application.data.Client;
-//import com.example.multimodule.data.Client;
-//import com.example.multimodule.data.Pack;
-//import com.example.multimodule.application.data.Pack;
 import com.example.multimodule.application.data.Client;
 import com.example.multimodule.application.data.Pack;
 import org.slf4j.Logger;
@@ -32,10 +28,10 @@ public class ClientIps {
     }
 
     public void addOwnerIpToPacks(ArrayList<Pack> packs) {
-        System.out.println("ALL IDS: " + data.size());
-        data.forEach((k, v) -> logger.error("K " + k + " V " + v));
+        logger.info("Registered clients: " + data.size());
+        data.forEach((k, v) -> logger.info("Client ID: " + k + " Client IP: " + v));
         for (Pack pack:packs) {
-            System.out.println("ADDING " + pack.getOwnerClientId() + " ip: " + data.get(pack.getOwnerClientId()));
+            logger.info("ADDING owner ip address for pack from client with id" + pack.getOwnerClientId() + ", ip: " + data.get(pack.getOwnerClientId()));
             pack.setOwnerClientIp(data.get(pack.getOwnerClientId()));
         }
     }
