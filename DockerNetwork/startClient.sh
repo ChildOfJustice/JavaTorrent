@@ -1,0 +1,1 @@
+java -jar client-0.0.1-SNAPSHOT.jar --center.url=http://$1:8080 --thisClient.url=http://$2:8081 --storage.path=$3 --storage.filesFolder=Files

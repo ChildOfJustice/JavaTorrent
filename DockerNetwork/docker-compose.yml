@@ -1,0 +1,64 @@
+version: '2'
+
+services:
+  center:
+    container_name: center
+    image: openjdk
+    command: >
+      bash -c "
+        cd /usr/app &&
+        sh startCenter.sh
+      "
+    volumes:
+      - .:/usr/app
+    healthcheck:
+      test: curl http://10.5.0.5:8080/packs
+    networks:  
+      maiNetwork:
+        ipv4_address: 10.5.0.5
+
+  client_1:
+    container_name: client_1
+    image: openjdk
+    command: >
+      bash -c "
+        cd /usr/app &&
+        sh startClient.sh 10.5.0.5 10.5.1.1 /usr/app/ClientStorage_1
+      "
+    volumes:
+      - .:/usr/app
+    ports:
+     - "8081:8081"
+    networks:  
+      maiNetwork:
+        ipv4_address: 10.5.1.1
+    depends_on:
+      center:
+        condition: service_healthy
+
+  client_2:
+    container_name: client_2
+    image: openjdk
+    command: >
+      bash -c "
+        cd /usr/app &&
+        sh startClient.sh 10.5.0.5 10.5.1.2 /usr/app/ClientStorage_2
+      "
+    volumes:
+      - .:/usr/app
+    ports:
+     - "8082:8081"
+    networks:  
+      maiNetwork:
+        ipv4_address: 10.5.1.2
+    depends_on:
+      center:
+        condition: service_healthy
+
+networks:
+  maiNetwork:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
